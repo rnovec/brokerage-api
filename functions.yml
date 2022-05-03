@@ -1,0 +1,16 @@
+functions:
+  brokerage_api:
+    image: 258172390462.dkr.ecr.us-west-1.amazonaws.com/brokerage_api:lambda
+    events:
+      - http:
+          path: /
+          method: get
+          cors: true
+      - http:
+          path: accounts/
+          method: post
+          cors: true
+      - http:
+          path: accounts/{accountId}/orders
+          method: post
+          cors: true
