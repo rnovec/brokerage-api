@@ -1,0 +1,17 @@
+service: test-lambda
+
+frameworkVersion: "3.16.0"
+
+provider:
+  name: aws
+  stage: ${opt:stage}
+  region: us-west-1
+  lambdaHashingVersion: 20201221
+  memorySize: 1024
+  timeout: 30
+  apiName: ${self:service}-${opt:stage}
+  apiGateway:
+    description: REST API ${self:service}
+    metrics: true
+
+functions: ${file(functions.yml):functions}
