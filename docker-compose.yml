@@ -6,6 +6,6 @@ services:
       context: .
       dockerfile: ./etc/docker/local/Dockerfile
     volumes:
-      - ./app/:/code/app
+      - ./app/:/usr/src/app
     ports:
       - 8000:8000
