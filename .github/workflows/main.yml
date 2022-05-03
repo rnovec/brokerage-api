@@ -83,7 +83,7 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
       - name: Deploy new Lambda
-        run: aws lambda update-function-code --function-name gbm-challenge-test --s3-bucket brokerage-api-storage --s3-key api.zip --region us-west-2
+        run: aws lambda update-function-code --function-name gbm-challenge-test --s3-bucket gbm-challenge-storage --s3-key api.zip --region us-west-1
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
