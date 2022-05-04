@@ -7,11 +7,14 @@ from mangum import Mangum
 from app.api import api_router
 from app.database.config import Base, engine
 
+from .settings import settings
+
 Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="Brokerage API",
     version="1.0.0",
-    openapi_url=os.getenv("OPENAPI_URL", "/openapi.json"),
+    openapi_prefix=settings.openapi_prefix,
+    openapi_url=settings.openapi_url,
 )
 
 app.include_router(api_router)
