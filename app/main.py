@@ -6,7 +6,7 @@ from app.api import api_router
 from app.database.config import Base, engine
 
 Base.metadata.create_all(bind=engine)
-app = FastAPI(title="Brokerage API", version="1.0.0", openapi_prefix="")
+app = FastAPI(title="Brokerage API", version="1.0.0", root_path="/dev/")
 
 app.include_router(api_router)
 
