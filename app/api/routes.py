@@ -3,12 +3,14 @@ from sqlalchemy.orm import Session
 
 from app.api.constants import (
     CLOSED_MARKET_ERROR_KEY,
+    DUPLICATED_OPERATION_ERROR_KEY,
     INSUFFICIENT_FUNDS_ERROR_KEY,
     INSUFFICIENT_STOCKS_ERROR_KEY,
     INVALID_OPERATION_ERROR_KEY,
 )
 from app.api.exceptions import (
     ClosedMarketException,
+    DuplicatedOperationException,
     InsufficentFundsException,
     InsufficentStocksException,
     InvalidOperationException,
@@ -39,6 +41,8 @@ def create_order(
         controllers.create_order(db=db, payload=data, account=account)
     except ClosedMarketException:
         business_errors.append(CLOSED_MARKET_ERROR_KEY)
+    except DuplicatedOperationException:
+        business_errors.append(DUPLICATED_OPERATION_ERROR_KEY)
     except InsufficentFundsException:
         business_errors.append(INSUFFICIENT_FUNDS_ERROR_KEY)
     except InsufficentStocksException:

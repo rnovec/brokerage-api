@@ -12,3 +12,7 @@ class InvalidOperationException(Exception):
 
 class ClosedMarketException(Exception):
     pass
+
+
+class DuplicatedOperationException(Exception):
+    pass

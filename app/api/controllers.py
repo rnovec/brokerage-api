@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
@@ -9,6 +9,7 @@ from app.api.constants import (
 )
 from app.api.exceptions import (
     ClosedMarketException,
+    DuplicatedOperationException,
     InsufficentFundsException,
     InsufficentStocksException,
     InvalidOperationException,
@@ -41,6 +42,29 @@ def update_account_balance(
     return account
 
 
+def get_account_stocks(db: Session, account_id: int, issuer_name: str = None):
+    """Get the latest orders for a given investment account."""
+    return db.query(Order).filter(
+        Order.account_id == account_id,
+        Order.operation == Order.Operations.BUY,
+        Order.issuer_name == issuer_name,
+    )
+
+
+def get_latest_orders(db: Session, account_id: int, operation: str, minutes: int = 5):
+    """Get the latest orders for a given investment account."""
+    if operation == BUY_ORDER_OPERATION:
+        operation = Order.Operations.BUY
+    elif operation == SELL_ORDER_OPERATION:
+        operation = Order.Operations.SELL
+
+    return db.query(Order).filter(
+        Order.operation == operation,
+        Order.account_id == account_id,
+        Order.created_at >= datetime.utcnow() - timedelta(minutes=minutes),
+    )
+
+
 def create_order(db: Session, payload: OrderSchema, account: Account):
     """Create a new buy/sell order."""
     order = None
@@ -48,16 +72,16 @@ def create_order(db: Session, payload: OrderSchema, account: Account):
     if not is_time_between(timestamp.time()):
         raise ClosedMarketException()
 
+    has_recent_orders = get_latest_orders(db, account.id, payload.operation).count() > 0
+    if has_recent_orders:
+        raise DuplicatedOperationException()
+
     order_amount = payload.total_shares * payload.shared_price
     if payload.operation == BUY_ORDER_OPERATION and order_amount > account.cash:
         raise InsufficentFundsException(f"Account {account.id} has insufficient funds.")
 
     elif payload.operation == SELL_ORDER_OPERATION:
-        stocks = db.query(Order).filter(
-            Order.account_id == account.id,
-            Order.operation == Order.Operations.BUY,
-            Order.issuer_name == payload.issuer_name,
-        )
+        stocks = get_account_stocks(db, account.id, payload.issuer_name)
         if stocks.count() == 0:
             raise InsufficentStocksException(f"Account {account.id} has no orders.")
 
