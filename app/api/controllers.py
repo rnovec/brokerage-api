@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 
 from app.api.constants import (
@@ -5,7 +7,13 @@ from app.api.constants import (
     SELL_ORDER_OPERATION,
     SUPPORTED_ORDER_OPERATIONS,
 )
-from app.api.exceptions import InsufficentFunds, InsufficentStocks, InvalidOperation
+from app.api.exceptions import (
+    ClosedMarketException,
+    InsufficentFundsException,
+    InsufficentStocksException,
+    InvalidOperationException,
+)
+from app.api.utils import is_time_between
 from app.database.models import Account, Order
 
 from .schemas import AccountSchema, OrderSchema
@@ -36,10 +44,13 @@ def update_account_balance(
 def create_order(db: Session, payload: OrderSchema, account: Account):
     """Create a new buy/sell order."""
     order = None
+    timestamp = datetime.fromtimestamp(payload.timestamp)
+    if not is_time_between(timestamp.time()):
+        raise ClosedMarketException()
 
     order_amount = payload.total_shares * payload.shared_price
     if payload.operation == BUY_ORDER_OPERATION and order_amount > account.cash:
-        raise InsufficentFunds(f"Account {account.id} has insufficient funds.")
+        raise InsufficentFundsException(f"Account {account.id} has insufficient funds.")
 
     elif payload.operation == SELL_ORDER_OPERATION:
         stocks = db.query(Order).filter(
@@ -48,7 +59,7 @@ def create_order(db: Session, payload: OrderSchema, account: Account):
             Order.issuer_name == payload.issuer_name,
         )
         if stocks.count() == 0:
-            raise InsufficentStocks(f"Account {account.id} has no orders.")
+            raise InsufficentStocksException(f"Account {account.id} has no orders.")
 
     if payload.operation in SUPPORTED_ORDER_OPERATIONS:
         order = Order(
@@ -66,6 +77,8 @@ def create_order(db: Session, payload: OrderSchema, account: Account):
         # Update the account balance
         update_account_balance(db, order.operation, account, order_amount)
     else:
-        raise InvalidOperation(f"Operation {payload.operation} is not supported.")
+        raise InvalidOperationException(
+            f"Operation {payload.operation} is not supported."
+        )
 
     return order

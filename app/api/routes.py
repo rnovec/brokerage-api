@@ -2,11 +2,17 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.api.constants import (
+    CLOSED_MARKET_ERROR_KEY,
     INSUFFICIENT_FUNDS_ERROR_KEY,
     INSUFFICIENT_STOCKS_ERROR_KEY,
     INVALID_OPERATION_ERROR_KEY,
 )
-from app.api.exceptions import InsufficentFunds, InsufficentStocks, InvalidOperation
+from app.api.exceptions import (
+    ClosedMarketException,
+    InsufficentFundsException,
+    InsufficentStocksException,
+    InvalidOperationException,
+)
 from app.database.config import get_session
 from app.database.models import Account
 
@@ -31,11 +37,13 @@ def create_order(
     business_errors = []
     try:
         controllers.create_order(db=db, payload=data, account=account)
-    except InsufficentFunds:
+    except ClosedMarketException:
+        business_errors.append(CLOSED_MARKET_ERROR_KEY)
+    except InsufficentFundsException:
         business_errors.append(INSUFFICIENT_FUNDS_ERROR_KEY)
-    except InsufficentStocks:
+    except InsufficentStocksException:
         business_errors.append(INSUFFICIENT_STOCKS_ERROR_KEY)
-    except InvalidOperation:
+    except InvalidOperationException:
         business_errors.append(INVALID_OPERATION_ERROR_KEY)
 
     return schemas.OperationSchemaResponse(

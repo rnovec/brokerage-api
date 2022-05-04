@@ -1,10 +1,14 @@
-class InsufficentFunds(Exception):
+class InsufficentFundsException(Exception):
     pass
 
 
-class InsufficentStocks(Exception):
+class InsufficentStocksException(Exception):
     pass
 
 
-class InvalidOperation(Exception):
+class InvalidOperationException(Exception):
+    pass
+
+
+class ClosedMarketException(Exception):
     pass
