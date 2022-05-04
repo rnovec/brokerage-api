@@ -1,3 +1,5 @@
+import os
+
 import uvicorn
 from fastapi import FastAPI
 from mangum import Mangum
@@ -6,7 +8,11 @@ from app.api import api_router
 from app.database.config import Base, engine
 
 Base.metadata.create_all(bind=engine)
-app = FastAPI(title="Brokerage API", version="1.0.0")
+app = FastAPI(
+    title="Brokerage API",
+    version="1.0.0",
+    openapi_url=os.getenv("OPENAPI_URL", "/openapi.json"),
+)
 
 app.include_router(api_router)
 
