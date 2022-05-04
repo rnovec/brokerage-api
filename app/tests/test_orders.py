@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 
 from app.api.constants import (
     CLOSED_MARKET_ERROR_KEY,
+    DUPLICATED_OPERATION_ERROR_KEY,
     INSUFFICIENT_FUNDS_ERROR_KEY,
     INSUFFICIENT_STOCKS_ERROR_KEY,
 )
@@ -33,8 +34,8 @@ def test_create_buy_order():
     assert order["business_errors"] == []
 
 
-def test_create_sell_order():
-    """Test creating a sell order."""
+def test_create_sell_order_failed():
+    """Test creating a sell order with insufficient stocks."""
     # Create an account
     response = client.post("/accounts", json={"cash": 1000})
     account = response.json()
@@ -49,6 +50,31 @@ def test_create_sell_order():
     assert "current_balance" in order
     assert "business_errors" in order
     assert INSUFFICIENT_STOCKS_ERROR_KEY in order["business_errors"]
+
+
+def test_create_sell_order_success():
+    """Test creating a sell order."""
+    # Create an account
+    response = client.post("/accounts", json={"cash": 1000})
+    account = response.json()
+    account_id = account["id"]
+
+    # Create a buy order
+    response = client.post(
+        f"/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
+    )
+    order = response.json()
+    assert response.status_code == 200
+
+    # Create a sell order
+    response = client.post(
+        f"/accounts/{account_id}/orders", json=SELL_ORDER_TEST_PAYLOAD
+    )
+    order = response.json()
+    assert response.status_code == 200
+    assert "current_balance" in order
+    assert "business_errors" in order
+    assert order["business_errors"] == []
 
 
 def test_insufficient_balance():
@@ -85,3 +111,29 @@ def test_closed_market():
     assert "business_errors" in order
     assert order["business_errors"] != []
     assert CLOSED_MARKET_ERROR_KEY in order["business_errors"]
+
+
+def test_create_duplicated_operation():
+    """Test creating a sell order."""
+    # Create an account
+    response = client.post("/accounts", json={"cash": 1000})
+    account = response.json()
+    account_id = account["id"]
+
+    # Create a buy order
+    response = client.post(
+        f"/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
+    )
+    order = response.json()
+    assert response.status_code == 200
+    assert order["business_errors"] == []
+
+    # Create a sell order
+    response = client.post(
+        f"/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
+    )
+    order = response.json()
+    assert response.status_code == 200
+    assert "current_balance" in order
+    assert "business_errors" in order
+    assert DUPLICATED_OPERATION_ERROR_KEY in order["business_errors"]
