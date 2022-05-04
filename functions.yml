@@ -3,11 +3,15 @@ functions:
     image: 258172390462.dkr.ecr.us-west-1.amazonaws.com/brokerage_api:lambda
     events:
       - http:
-          path: docs
+          path: /
+          method: get
+          private: false
+      - http:
+          path: /docs
           method: ANY
           private: false
       - http:
-          path: redoc
+          path: /redoc
           method: ANY
           private: false
       - http:
@@ -15,11 +19,11 @@ functions:
           method: ANY
           private: false
       - http:
-          path: accounts
+          path: /accounts
           method: post
           private: false
       - http:
-          path: accounts/{accountId}/orders
+          path: /accounts/{accountId}/orders
           method: post
           private: false
       
