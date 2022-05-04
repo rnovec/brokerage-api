@@ -4,3 +4,7 @@ class InsufficentFunds(Exception):
 
 class InsufficentStocks(Exception):
     pass
+
+
+class InvalidOperation(Exception):
+    pass

@@ -1,8 +1,11 @@
 from sqlalchemy.orm import Session
 
-from app.api.constants import (BUY_ORDER_OPERATION, SELL_ORDER_OPERATION,
-                               SUPPORTED_ORDER_OPERATIONS)
-from app.api.exceptions import InsufficentFunds, InsufficentStocks
+from app.api.constants import (
+    BUY_ORDER_OPERATION,
+    SELL_ORDER_OPERATION,
+    SUPPORTED_ORDER_OPERATIONS,
+)
+from app.api.exceptions import InsufficentFunds, InsufficentStocks, InvalidOperation
 from app.database.models import Account, Order
 
 from .schemas import AccountSchema, OrderSchema
@@ -62,5 +65,7 @@ def create_order(db: Session, payload: OrderSchema, account: Account):
 
         # Update the account balance
         update_account_balance(db, order.operation, account, order_amount)
+    else:
+        raise InvalidOperation(f"Operation {payload.operation} is not supported.")
 
     return order

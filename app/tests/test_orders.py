@@ -1,7 +1,9 @@
 from fastapi.testclient import TestClient
 
-from app.api.constants import (INSUFFICIENT_FUNDS_ERROR_KEY,
-                               INSUFFICIENT_STOCKS_ERROR_KEY)
+from app.api.constants import (
+    INSUFFICIENT_FUNDS_ERROR_KEY,
+    INSUFFICIENT_STOCKS_ERROR_KEY,
+)
 from app.main import app
 from app.tests.mocks import BUY_ORDER_TEST_PAYLOAD, SELL_ORDER_TEST_PAYLOAD
 

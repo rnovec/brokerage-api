@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.constants import (INSUFFICIENT_FUNDS_ERROR_KEY,
-                               INSUFFICIENT_STOCKS_ERROR_KEY)
-from app.api.exceptions import InsufficentFunds, InsufficentStocks
+from app.api.constants import (
+    INSUFFICIENT_FUNDS_ERROR_KEY,
+    INSUFFICIENT_STOCKS_ERROR_KEY,
+    INVALID_OPERATION_ERROR_KEY,
+)
+from app.api.exceptions import InsufficentFunds, InsufficentStocks, InvalidOperation
 from app.database.config import get_session
 from app.database.models import Account
 
@@ -32,6 +35,8 @@ def create_order(
         business_errors.append(INSUFFICIENT_FUNDS_ERROR_KEY)
     except InsufficentStocks:
         business_errors.append(INSUFFICIENT_STOCKS_ERROR_KEY)
+    except InvalidOperation:
+        business_errors.append(INVALID_OPERATION_ERROR_KEY)
 
     return schemas.OperationSchemaResponse(
         current_balance=schemas.BalanceSchema(
