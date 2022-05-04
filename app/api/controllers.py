@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 
-from app.api.constants import SUPPORTED_ORDER_OPERATIONS
+from app.api.constants import (BUY_ORDER_OPERATION, SELL_ORDER_OPERATION,
+                               SUPPORTED_ORDER_OPERATIONS)
+from app.api.exceptions import InsufficentFunds, InsufficentStocks
 from app.database.models import Account, Order
 
 from .schemas import AccountSchema, OrderSchema
@@ -15,28 +17,39 @@ def create_account(db: Session, payload: AccountSchema):
     return account
 
 
-def update_account_balance(db: Session, order: OrderSchema, account: Account):
+def update_account_balance(
+    db: Session, operation: Order.Operations, account: Account, amount: float
+):
     """Update the balance of an investment account."""
-    print(account.cash, order.operation)
-    if order.operation == Order.Operations.BUY:
-        account.cash -= order.total_shares * order.shared_price
-    elif order.operation == Order.Operations.SELL:
-        account.cash += order.total_shares * order.shared_price
+    if operation == Order.Operations.BUY:
+        account.cash -= amount
+    elif operation == Order.Operations.SELL:
+        account.cash += amount
     db.commit()
     db.refresh(account)
     return account
 
 
-def create_order(db: Session, payload: OrderSchema, account_id: int):
+def create_order(db: Session, payload: OrderSchema, account: Account):
     """Create a new buy/sell order."""
     order = None
-    account = db.query(Account).get(account_id)
-    if account is None:
-        raise ValueError("Account not found.")
+
+    order_amount = payload.total_shares * payload.shared_price
+    if payload.operation == BUY_ORDER_OPERATION and order_amount > account.cash:
+        raise InsufficentFunds(f"Account {account.id} has insufficient funds.")
+
+    elif payload.operation == SELL_ORDER_OPERATION:
+        stocks = db.query(Order).filter(
+            Order.account_id == account.id,
+            Order.operation == Order.Operations.BUY,
+            Order.issuer_name == payload.issuer_name,
+        )
+        if stocks.count() == 0:
+            raise InsufficentStocks(f"Account {account.id} has no orders.")
 
     if payload.operation in SUPPORTED_ORDER_OPERATIONS:
         order = Order(
-            account_id=account_id,
+            account_id=account.id,
             timestamp=payload.timestamp,
             operation=payload.operation,
             issuer_name=payload.issuer_name,
@@ -48,6 +61,6 @@ def create_order(db: Session, payload: OrderSchema, account_id: int):
         db.refresh(order)
 
         # Update the account balance
-        account = update_account_balance(db, order, account)
+        update_account_balance(db, order.operation, account, order_amount)
 
-    return order, account
+    return order
