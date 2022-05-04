@@ -3,19 +3,23 @@ functions:
     image: 258172390462.dkr.ecr.us-west-1.amazonaws.com/brokerage_api:lambda
     events:
       - http:
-          path: docs/
-          method: get
-          cors: true
+          path: docs
+          method: ANY
+          private: false
       - http:
-          path: redoc/
-          method: get
-          cors: true
+          path: redoc
+          method: ANY
+          private: false
       - http:
-          path: accounts/
+          path: /openapi.json
+          method: ANY
+          private: false
+      - http:
+          path: accounts
           method: post
-          cors: true
+          private: false
       - http:
           path: accounts/{accountId}/orders
           method: post
-          cors: true
+          private: false
       
