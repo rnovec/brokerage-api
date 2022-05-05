@@ -1,14 +1,18 @@
 from fastapi.testclient import TestClient
 
-from app.api.constants import (
+from app.common.constants import (
     CLOSED_MARKET_ERROR_KEY,
     DUPLICATED_OPERATION_ERROR_KEY,
     INSUFFICIENT_FUNDS_ERROR_KEY,
     INSUFFICIENT_STOCKS_ERROR_KEY,
 )
 from app.main import app
-from app.tests.mocks import BUY_ORDER_TEST_PAYLOAD, SELL_ORDER_TEST_PAYLOAD
-from app.tests.mocks.orders import CLOSED_MARKET_ORDER_TEST_PAYLOAD
+
+from .mocks import (
+    BUY_ORDER_TEST_PAYLOAD,
+    CLOSED_MARKET_ORDER_TEST_PAYLOAD,
+    SELL_ORDER_TEST_PAYLOAD,
+)
 
 client = TestClient(app)
 
@@ -16,13 +20,13 @@ client = TestClient(app)
 def test_create_buy_order():
     """Test creating a buy order."""
     # Create an account
-    response = client.post("/accounts", json={"cash": 1000})
+    response = client.post("/v1/accounts", json={"cash": 1000})
     account = response.json()
     account_id = account["id"]
 
     # Create a buy order
     response = client.post(
-        f"/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
+        f"/v1/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
     )
     order = response.json()
     assert response.status_code == 200
@@ -37,13 +41,13 @@ def test_create_buy_order():
 def test_create_sell_order_failed():
     """Test creating a sell order with insufficient stocks."""
     # Create an account
-    response = client.post("/accounts", json={"cash": 1000})
+    response = client.post("/v1/accounts", json={"cash": 1000})
     account = response.json()
     account_id = account["id"]
 
     # Create a sell order
     response = client.post(
-        f"/accounts/{account_id}/orders", json=SELL_ORDER_TEST_PAYLOAD
+        f"/v1/accounts/{account_id}/orders", json=SELL_ORDER_TEST_PAYLOAD
     )
     order = response.json()
     assert response.status_code == 200
@@ -55,20 +59,20 @@ def test_create_sell_order_failed():
 def test_create_sell_order_success():
     """Test creating a sell order."""
     # Create an account
-    response = client.post("/accounts", json={"cash": 1000})
+    response = client.post("/v1/accounts", json={"cash": 1000})
     account = response.json()
     account_id = account["id"]
 
     # Create a buy order
     response = client.post(
-        f"/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
+        f"/v1/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
     )
     order = response.json()
     assert response.status_code == 200
 
     # Create a sell order
     response = client.post(
-        f"/accounts/{account_id}/orders", json=SELL_ORDER_TEST_PAYLOAD
+        f"/v1/accounts/{account_id}/orders", json=SELL_ORDER_TEST_PAYLOAD
     )
     order = response.json()
     assert response.status_code == 200
@@ -80,13 +84,13 @@ def test_create_sell_order_success():
 def test_insufficient_balance():
     """Test creating a buy order on and account with insufficient cash balance."""
     # Create an account
-    response = client.post("/accounts", json={"cash": 0})
+    response = client.post("/v1/accounts", json={"cash": 0})
     account = response.json()
     account_id = account["id"]
 
     # Create a sell order
     response = client.post(
-        f"/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
+        f"/v1/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
     )
     order = response.json()
     assert response.status_code == 200
@@ -98,13 +102,13 @@ def test_insufficient_balance():
 def test_closed_market():
     """Test creating a buy order on and account out of time."""
     # Create an account
-    response = client.post("/accounts", json={"cash": 100})
+    response = client.post("/v1/accounts", json={"cash": 100})
     account = response.json()
     account_id = account["id"]
 
     # Create a sell order
     response = client.post(
-        f"/accounts/{account_id}/orders", json=CLOSED_MARKET_ORDER_TEST_PAYLOAD
+        f"/v1/accounts/{account_id}/orders", json=CLOSED_MARKET_ORDER_TEST_PAYLOAD
     )
     order = response.json()
     assert response.status_code == 200
@@ -116,13 +120,13 @@ def test_closed_market():
 def test_create_duplicated_operation():
     """Test creating a sell order."""
     # Create an account
-    response = client.post("/accounts", json={"cash": 1000})
+    response = client.post("/v1/accounts", json={"cash": 1000})
     account = response.json()
     account_id = account["id"]
 
     # Create a buy order
     response = client.post(
-        f"/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
+        f"/v1/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
     )
     order = response.json()
     assert response.status_code == 200
@@ -130,7 +134,7 @@ def test_create_duplicated_operation():
 
     # Create a sell order
     response = client.post(
-        f"/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
+        f"/v1/accounts/{account_id}/orders", json=BUY_ORDER_TEST_PAYLOAD
     )
     order = response.json()
     assert response.status_code == 200

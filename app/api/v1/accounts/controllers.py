@@ -2,22 +2,21 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
-from app.api.constants import (
+from app.common.constants import (
     BUY_ORDER_OPERATION,
     SELL_ORDER_OPERATION,
     SUPPORTED_ORDER_OPERATIONS,
 )
-from app.api.exceptions import (
+from app.common.exceptions import (
     ClosedMarketException,
     DuplicatedOperationException,
     InsufficentFundsException,
     InsufficentStocksException,
     InvalidOperationException,
 )
-from app.api.utils import is_time_between
-from app.database.models import Account, Order
-
-from .schemas import AccountSchema, OrderSchema
+from app.common.utils import is_time_between
+from app.core.models.database import Account, Order
+from app.core.schemas import AccountSchema, OrderSchema
 
 
 def create_account(db: Session, payload: AccountSchema):
