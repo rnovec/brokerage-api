@@ -19,11 +19,11 @@ functions:
           method: ANY
           private: false
       - http:
-          path: /accounts
+          path: /v1/accounts
           method: post
           private: false
       - http:
-          path: /accounts/{accountId}/orders
+          path: /v1/accounts/{accountId}/orders
           method: post
           private: false
       
