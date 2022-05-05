@@ -15,7 +15,7 @@ from app.common.exceptions import (
     InvalidOperationException,
 )
 from app.common.utils import is_time_between
-from app.core.models.database import Account, Order
+from app.core.models import Account, Order
 from app.core.schemas import AccountSchema, OrderSchema
 
 

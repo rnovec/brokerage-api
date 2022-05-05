@@ -2,10 +2,9 @@ import enum
 from datetime import datetime
 
 import sqlalchemy as _sql
-from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.orm import relationship
 
-from . import Base
+from .config import Base
 
 
 class Account(Base):

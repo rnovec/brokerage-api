@@ -16,8 +16,7 @@ from app.common.exceptions import (
     InvalidOperationException,
 )
 from app.core import schemas
-from app.core.models import get_session
-from app.core.models.database import Account
+from app.core.models import Account, get_session
 
 from . import controllers
 
