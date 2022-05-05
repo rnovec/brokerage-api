@@ -123,7 +123,7 @@ docker-compose run --rm api pytest
 
 # Directory Structure
 
-The following is an overview of the directory structure. It should be noted that since this uses tenant settings, the directory structure differs from traditional Django in certain aspects.
+The following is an overview of the directory structures.
 
 Deployment and build related files can be found in the `etc` folder.
 
