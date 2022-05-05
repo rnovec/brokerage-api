@@ -65,7 +65,7 @@ venv/Scripts/activate.ps1
 source venv/bin/activate
 ```
 
-You should now be in the virtual environment and see the `(venv)` tag as part of your prompt. If you are not using Python 3.7, the next command will fail.
+You should now be in the virtual environment and see the `(venv)` tag as part of your prompt. If you are not using Python 3.8+, the next command will fail.
 
 - Install package requirements
 
