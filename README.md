@@ -134,8 +134,9 @@ Deployment and build related files can be found in the `etc` folder.
 
 Source code is located in the `app` folder.
 
-- `app\api` contains the API code (routes, controllers and schemas).
-- `app\database` contains the database configuration and models.
+- `app\api` contains the API versioned code.
+- `app\core` contains the database configuration, models and schemas.
+- `app\common` contains global utilities, constants and exceptions.
 - `app\tests` contains the unit and integration tests.
 - `app\main.py` is the entry point for the application.
 - `app\settings.py` contains the global settings for the project.
@@ -144,10 +145,8 @@ Source code is located in the `app` folder.
 
 Walk through the live example and test the API:
 
-- [stg - https://gongwy0jx2.execute-api.us-west-1.amazonaws.com/dev/docs](https://gongwy0jx2.execute-api.us-west-1.amazonaws.com/dev/docs)
+- [stg - https://gongwy0jx2.execute-api.us-west-1.amazonaws.com/stg/docs](https://gongwy0jx2.execute-api.us-west-1.amazonaws.com/stg/docs)
 - [dev - https://brokerage-api.herokuapp.com/docs](https://brokerage-api.herokuapp.com/docs)
-
-## Notes and restrictions
 
 ## Author ✒
 
