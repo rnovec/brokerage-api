@@ -2,7 +2,7 @@ import sqlalchemy as _sql
 import sqlalchemy.ext.declarative as _declarative
 import sqlalchemy.orm as _orm
 
-from app.settings import settings
+from app.core.settings import settings
 
 engine = _sql.create_engine(settings.database_uri)
 
