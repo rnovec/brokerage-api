@@ -5,7 +5,7 @@ import sqlalchemy as _sql
 from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.orm import relationship
 
-from .config import Base
+from . import Base
 
 
 class Account(Base):

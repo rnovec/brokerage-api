@@ -1,6 +1,1 @@
-from fastapi import APIRouter
-
-from .routes import router
-
-api_router = APIRouter()
-api_router.include_router(router)
+from .v1 import api_router

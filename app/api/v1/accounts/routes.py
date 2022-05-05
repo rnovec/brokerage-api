@@ -1,24 +1,25 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.constants import (
+from app.common.constants import (
     CLOSED_MARKET_ERROR_KEY,
     DUPLICATED_OPERATION_ERROR_KEY,
     INSUFFICIENT_FUNDS_ERROR_KEY,
     INSUFFICIENT_STOCKS_ERROR_KEY,
     INVALID_OPERATION_ERROR_KEY,
 )
-from app.api.exceptions import (
+from app.common.exceptions import (
     ClosedMarketException,
     DuplicatedOperationException,
     InsufficentFundsException,
     InsufficentStocksException,
     InvalidOperationException,
 )
-from app.database.config import get_session
-from app.database.models import Account
+from app.core import schemas
+from app.core.models import get_session
+from app.core.models.database import Account
 
-from . import controllers, schemas
+from . import controllers
 
 router = APIRouter()
 

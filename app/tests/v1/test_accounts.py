@@ -8,7 +8,7 @@ client = TestClient(app)
 def test_create_account():
     """Test endpoint to create a new investment account."""
     payload = {"cash": 1000}
-    response = client.post("/accounts", json=payload)
+    response = client.post("/v1/accounts", json=payload)
     account = response.json()
     assert response.status_code == 201
     assert "id" in account
