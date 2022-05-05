@@ -64,6 +64,16 @@ def get_latest_orders(db: Session, account_id: int, operation: str, minutes: int
     )
 
 
+def get_issuers(db: Session, account_id: int):
+    """Get the latest orders for a given investment account."""
+    return (
+        db.query(Order)
+        .filter(Order.account_id == account_id, Order.operation == Order.Operations.BUY)
+        .group_by(Order.issuer_name)
+        .all()
+    )
+
+
 def create_order(db: Session, payload: OrderSchema, account: Account):
     """Create a new buy/sell order."""
     order = None

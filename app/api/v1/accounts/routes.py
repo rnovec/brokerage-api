@@ -36,6 +36,7 @@ def create_order(
     id: int, data: schemas.OrderSchema, db: Session = Depends(get_session)
 ):
     account = db.query(Account).get(id)
+    issuers = []
     business_errors = []
     try:
         controllers.create_order(db=db, payload=data, account=account)
@@ -50,9 +51,12 @@ def create_order(
     except InvalidOperationException:
         business_errors.append(INVALID_OPERATION_ERROR_KEY)
 
+    if not business_errors:
+        issuers = controllers.get_issuers(db=db, account_id=account.id)
     return schemas.OperationSchemaResponse(
         current_balance=schemas.BalanceSchema(
-            cash=account.cash, issuers=account.orders
+            cash=account.cash,
+            issuers=issuers,
         ),
         business_errors=business_errors,
     )
